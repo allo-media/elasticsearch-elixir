@@ -15,8 +15,6 @@ defmodule Elasticsearch.Exception do
     :raw
   ]
 
-  @type t :: %__MODULE__{}
-
   @enforce_keys @keys
   defexception @keys
 
