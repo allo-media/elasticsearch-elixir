@@ -24,7 +24,7 @@ defmodule Elasticsearch.Index.BulkTest do
          body: %{
            "errors" => true,
            "items" => [
-             %{"create" => %{"error" => %{"type" => "type", "reason" => "reason"}}}
+             %{"index" => %{"error" => %{"type" => "type", "reason" => "reason"}}}
            ]
          }
        }}

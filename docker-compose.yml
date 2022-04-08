@@ -1,4 +1,5 @@
-version: "3.2"
+version: '3'
+
 services:
   db:
     image: postgres
@@ -6,21 +7,21 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+
   elasticsearch:
-    # image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.13
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
     environment:
-      - node.name=es01
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - http.cors.allow-headers=Authorization
+      - indices.query.bool.max_clause_count=1024
     volumes:
-      - data:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
+      - 9200:9200
+
   code:
     container_name: "elasticsearch_elixir"
     build: .
@@ -37,6 +38,6 @@ services:
       - elasticsearch
     links:
       - db:postgres
+
 volumes:
-  data:
-    driver: local
+  esdata:

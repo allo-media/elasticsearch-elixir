@@ -211,13 +211,13 @@ defmodule Elasticsearch do
       iex> Elasticsearch.get(Cluster, "/nonexistent")
       {:error,
        %Elasticsearch.Exception{col: nil, line: nil,
-        message: "no such index", query: nil,
+        message: "no such index [nonexistent]", query: nil,
         raw: %{"error" => %{"index" => "nonexistent",
-            "index_uuid" => "_na_", "reason" => "no such index",
+            "index_uuid" => "_na_", "reason" => "no such index [nonexistent]",
             "resource.id" => "nonexistent",
             "resource.type" => "index_or_alias",
             "root_cause" => [%{"index" => "nonexistent",
-               "index_uuid" => "_na_", "reason" => "no such index",
+               "index_uuid" => "_na_", "reason" => "no such index [nonexistent]",
                "resource.id" => "nonexistent",
                "resource.type" => "index_or_alias",
                "type" => "index_not_found_exception"}],
@@ -245,7 +245,7 @@ defmodule Elasticsearch do
       true
 
       iex> Elasticsearch.get!(Cluster, "/nonexistent")
-      ** (Elasticsearch.Exception) (index_not_found_exception) no such index
+      ** (Elasticsearch.Exception) (index_not_found_exception) no such index [nonexistent]
   """
   @spec get!(Cluster.t(), url) :: map | no_return
   @spec get!(Cluster.t(), url, opts) :: map | no_return
@@ -356,7 +356,7 @@ defmodule Elasticsearch do
 
       iex> query = %{"query" => %{"match_all" => %{}}}
       ...> Elasticsearch.post!(Cluster, "/nonexistent/_search", query)
-      ** (Elasticsearch.Exception) (index_not_found_exception) no such index
+      ** (Elasticsearch.Exception) (index_not_found_exception) no such index [nonexistent]
   """
   @spec post!(Cluster.t(), url, data) :: map | no_return
   @spec post!(Cluster.t(), url, data, opts) :: map | no_return
@@ -380,13 +380,13 @@ defmodule Elasticsearch do
       iex> Elasticsearch.delete(Cluster, "/nonexistent")
       {:error,
        %Elasticsearch.Exception{col: nil, line: nil,
-        message: "no such index", query: nil,
+        message: "no such index [nonexistent]", query: nil,
         raw: %{"error" => %{"index" => "nonexistent",
-            "index_uuid" => "_na_", "reason" => "no such index",
+            "index_uuid" => "_na_", "reason" => "no such index [nonexistent]",
             "resource.id" => "nonexistent",
             "resource.type" => "index_or_alias",
             "root_cause" => [%{"index" => "nonexistent",
-               "index_uuid" => "_na_", "reason" => "no such index",
+               "index_uuid" => "_na_", "reason" => "no such index [nonexistent]",
                "resource.id" => "nonexistent",
                "resource.type" => "index_or_alias",
                "type" => "index_not_found_exception"}],
@@ -415,68 +415,13 @@ defmodule Elasticsearch do
   Raises an error if the resource is invalid.
 
       iex> Elasticsearch.delete!(Cluster, "/nonexistent")
-      ** (Elasticsearch.Exception) (index_not_found_exception) no such index
+      ** (Elasticsearch.Exception) (index_not_found_exception) no such index [nonexistent]
   """
   @spec delete!(Cluster.t(), url) :: map | no_return
   @spec delete!(Cluster.t(), url, opts) :: map | no_return
   def delete!(cluster, url, opts \\ []) do
     cluster
     |> delete(url, opts)
-    |> unwrap!()
-  end
-
-  @doc """
-  Determines whether a resource exists at a given Elasticsearch path
-
-  ## Examples
-
-      iex> Index.create_from_file(Cluster, "posts", "test/support/settings/posts.json")
-      ...> Elasticsearch.head(Cluster, "/posts")
-      {:ok, ""}
-
-  It returns an error if the given resource does not exist.
-
-      iex> Elasticsearch.head(Cluster, "/nonexistent")
-      {:error,
-      %Elasticsearch.Exception{
-        col: nil,
-        line: nil,
-        message: "",
-        query: nil,
-        raw: nil,
-        status: nil,
-        type: nil
-      }}
-  """
-  @spec head(Cluster.t(), url) :: response
-  @spec head(Cluster.t(), url, opts) :: response
-  def head(cluster, url, opts \\ []) do
-    config = Config.get(cluster)
-
-    config
-    |> config.api.request(:head, url, "", opts)
-    |> format()
-  end
-
-  @doc """
-  Same as `head/1`, but returns the response and raises errors.
-
-  ## Examples
-
-      iex> Index.create_from_file(Cluster, "posts", "test/support/settings/posts.json")
-      ...> Elasticsearch.head!(Cluster, "/posts")
-      ""
-
-  Raises an error if the resource is invalid.
-
-      iex> Elasticsearch.head!(Cluster, "/nonexistent")
-      ** (Elasticsearch.Exception)
-  """
-  @spec head!(Cluster.t(), url) :: map | no_return
-  @spec head!(Cluster.t(), url, opts) :: map | no_return
-  def head!(cluster, url, opts \\ []) do
-    cluster
-    |> head(url, opts)
     |> unwrap!()
   end
 
