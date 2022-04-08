@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Elasticsearch.BuildTest do
            body: %{
              "errors" => true,
              "items" => [
-               %{"create" => %{"error" => %{"type" => "type", "reason" => "reason"}}}
+               %{"index" => %{"error" => %{"type" => "type", "reason" => "reason"}}}
              ]
            }
          }}
@@ -204,7 +204,8 @@ defmodule Mix.Tasks.Elasticsearch.BuildTest do
 
       assert output =~ "Pausing 0ms between bulk pages"
       resp = Elasticsearch.get!(TestCluster, "/posts/_search")
-      assert resp["hits"]["total"] == 10_000
+
+      assert resp["hits"]["total"]["value"] == 10_000
     end
 
     test "respects --bulk options" do
@@ -222,7 +223,7 @@ defmodule Mix.Tasks.Elasticsearch.BuildTest do
 
       assert output =~ "Pausing 10ms between bulk pages"
       resp = Elasticsearch.get!(TestCluster, "/posts/_search")
-      assert resp["hits"]["total"] == 2
+      assert resp["hits"]["total"]["value"] == 2
     end
 
     test "only keeps two index versions" do

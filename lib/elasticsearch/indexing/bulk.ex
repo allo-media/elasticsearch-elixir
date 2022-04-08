@@ -18,7 +18,7 @@ defmodule Elasticsearch.Index.Bulk do
 
       iex> Bulk.encode(Cluster, %Post{id: "my-id"}, "my-index")
       {:ok, \"\"\"
-      {"create":{"_index":"my-index","_id":"my-id"}}
+      {"index":{"_index":"my-index","_id":"my-id"}}
       {"title":null,"doctype":{"name":"post"},"author":null}
       \"\"\"}
 
@@ -44,16 +44,16 @@ defmodule Elasticsearch.Index.Bulk do
 
       iex> Bulk.encode!(Cluster, %Post{id: "my-id"}, "my-index")
       \"\"\"
-      {"create":{"_index":"my-index","_id":"my-id"}}
+      {"index":{"_index":"my-index","_id":"my-id"}}
       {"title":null,"doctype":{"name":"post"},"author":null}
       \"\"\"
 
       iex> Bulk.encode!(Cluster, 123, "my-index")
-      ** (Protocol.UndefinedError) protocol Elasticsearch.Document not implemented for 123 of type Integer
+      ** (Protocol.UndefinedError) protocol Elasticsearch.Document not implemented for 123 of type Integer. This protocol is implemented for the following type(s): Comment, Post
   """
   def encode!(cluster, struct, index) do
     config = Cluster.Config.get(cluster)
-    header = header(config, "create", index, struct)
+    header = header(config, "index", index, struct)
 
     document =
       struct
@@ -126,8 +126,8 @@ defmodule Elasticsearch.Index.Bulk do
   defp collect_errors({:ok, %{"errors" => true} = response}, errors) do
     new_errors =
       response["items"]
-      |> Enum.filter(&(&1["create"]["error"] != nil))
-      |> Enum.map(& &1["create"])
+      |> Enum.filter(&(&1["index"]["error"] != nil))
+      |> Enum.map(& &1["index"])
       |> Enum.map(&Elasticsearch.Exception.exception(response: &1))
 
     new_errors ++ errors
